@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+    <title>home</title>
+    <style>
+        :root {
+            font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+            line-height: 1.5;
+            font-weight: 400;
+            color-scheme: light dark;
+            color: rgba(255, 255, 255, 0.87);
+            background-color: rgb(29, 29, 29);
+            font-synthesis: none;
+            text-rendering: optimizeLegibility;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        nav {
+        display: flex; 
+        justify-content: space-between; 
+        align-items: center;
+        position: relative; /* Needed to position the pseudo-element correctly */
+        padding: 0 20px;
+        }
+
+        nav::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            height: 2px; /* Thickness of the gradient border */
+            background: linear-gradient(90deg, rgba(97,67,133,1) 0%, rgba(81,99,149,1) 100%);
+        }
+
+        h1 {
+            margin: 5px 0;
+            font-size: 3.3rem;
+            font-family: "Pacifico", cursive;
+            color: rgb(255, 255, 255);
+        }
+
+        ul {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            flex-grow: 1;
+            padding-right: 120px;
+        }
+
+        li {
+            margin: 0 20px;
+        }
+
+        a {
+            transition: transform 300ms ease;
+            display: inline-block; 
+            margin: 25px; 
+            color: #FFF;
+            text-decoration: none;
+            font-weight: 600;
+            text-shadow:0 0 15px #000000;
+        }
+
+        a:hover {
+            transform: scale(1.5);
+        }
+
+        .nav {
+            outline-width: 20px;
+            outline-color: rgb(134, 59, 255);
+        }
+        .logout {
+            position: fixed;
+            bottom: 20px; 
+            right: 20px;
+            padding: 10px 20px; 
+            background: rgb(53, 53, 53);
+            color: #ffffff;
+            font-size: 0.9rem;
+            line-height: 1.25rem;
+            font-weight: 600;
+            border-radius: 0.5rem;
+            box-shadow: rgba(0, 0, 0, 0.24) 0px 10px 18px;
+            border: none;
+        }
+        .logout:hover{
+            opacity: 75%;
+        }
+        .addFolder {
+            position: fixed;
+            bottom: 20px; 
+            left: 20px;
+            padding: 10px 20px; 
+            background: rgb(53, 53, 53);
+            color: #ffffff;
+            font-size: 0.9rem;
+            line-height: 1.25rem;
+            font-weight: 600;
+            border-radius: 0.5rem;
+            box-shadow: rgba(0, 0, 0, 0.24) 0px 10px 18px;
+            border: none;
+        }
+        .addFolder:hover{
+            opacity: 75%;
+        }
+        .card {
+            transition: transform 300ms ease;
+            width: 250px;
+            height: 200px;
+            border-radius: 15px;
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            position: relative;
+            margin: 25px;
+            overflow: hidden;
+            flex-direction: column;
+            justify-content: space-between; 
+            position: relative;
+        }
+
+        .card:hover {
+            transform: scale(1.2);
+            cursor: pointer;
+        }
+
+        .card-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 15px; 
+        }
+
+        .text {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between; 
+            color: aliceblue;
+            font-weight: 900;
+            font-size: 1.2em;
+            padding: 5px;
+            margin-right: 5px;
+            height: 100%; 
+        }
+
+        .subtitle {
+            font-size: .6em;
+            font-weight: 300;
+            color: white;
+            align-self: flex-end; 
+            margin-top: auto; 
+        }
+        .card:hover::before {
+            width: 140px;
+            height: 140px;
+            top: -30%;
+            left: 50%;
+            filter: blur(0rem);
+            }
+        .cards-container {
+            display: flex;
+            flex-wrap: wrap; 
+            justify-content: center; 
+            gap: 20px; 
+            padding: 20px; 
+        }
+
+        .modal {
+            display: none; 
+            position: fixed; 
+            z-index: 1;
+            left: 25%;
+            top: 25%;
+            width: 50%; 
+            height: 50%; 
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 25px;
+        }
+
+        .modal-content {
+            background-color: #292929;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 50%; 
+            box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+            animation-name: animatetop;
+            animation-duration: 0.4s;
+            border-radius: 25px;
+        }
+        
+
+        @keyframes animatetop {
+            from {top: -300px; opacity: 0}
+            to {top: 0; opacity: 1}
+        }
+
+        .modal-content form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .modal-content form label {
+            margin-top: 10px;
+        }
+
+        .modal-content form input[type="text"],
+        .modal-content form input[type="url"],
+        .modal-content form select {
+            padding: 8px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .modal-content form button.submitBtn {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background: linear-gradient(90deg, rgba(97,67,133,1) 0%, rgba(81,99,149,1) 100%);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .modal-content form button.submitBtn:hover {
+            opacity: 75%;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+
+    </style>
+</head>
+<body>
+    <nav>
+        <h1>Twilu</h1>
+        <ul>
+            <li><a href="/main">Home</a></li>
+            <li><a href="/social">Social</a></li>
+            <li><a href="/account">Account</a></li>
+        </ul>
+    </nav>
+    <div class="cards-container" hx-get="/api/user/folders" hx-trigger="load">
+        <p>Loading folders...</p>
+    </div>    
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <a href="#" class="close">&times;</a>
+            <form hx-post="/api/folder/create" class="form">
+                <label for="folderTitle">Folder Title:</label>
+                <input type="text" id="folderTitle" name="folderTitle" placeholder="Enter folder title" required>
+                
+                <label for="contributors">Contributors:</label>
+                <input type="text" id="contributors" name="contributors" placeholder="Name1, Name2...">
+        
+                <label for="isPrivate">Private:</label>
+                <select id="isPrivate" name="isPrivate">
+                    <option value="public">Public</option>
+                    <option value="private">Private</option>
+                </select>
+        
+                <label for="coverUrl">Cover Image URL:</label>
+                <input type="url" id="coverUrl" name="coverUrl" placeholder="http://example.com/cover.jpg">
+                
+                <button type="submit" class="submitBtn">Create Folder</button>
+            </form>
+        </div>
+    </div>    
+    <button class="logout" hx-post="/api/logout"> Log out</button>
+    <button class="addFolder" onclick="location.href='#modal';">New Folder</button>
+</body>
+<script>
+    var modal = document.getElementById('modal');
+    modal.style.display = "none";
+
+    var btn = document.querySelector('.addFolder');
+
+    var span = document.getElementsByClassName('close')[0];
+
+    btn.onclick = function() {
+        modal.style.display = "flex";
+    }
+
+    span.onclick = function() {
+        modal.style.display = "none";
+    }
+
+    window.onclick = function(event) {
+        if (event.target == modal) {
+            modal.style.display = "none";
+        }
+    }
+    span.onclick = function(event) {
+    event.preventDefault();
+    modal.style.display = "none";
+}
+</script>
+</html>

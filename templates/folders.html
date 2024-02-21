@@ -1,0 +1,14 @@
+{{if .HasFolders}}
+    {{range .Folders}}
+    <div class="card" style="background-image: url('{{.CoverURL}}');">
+        <div class="card-overlay">
+            <div class="text">
+                <span>{{.Name}}</span>
+                <p class="subtitle">@{{.OwnerUsername}}</p>
+            </div>
+        </div>
+    </div>
+    {{end}}
+{{else}}
+    <p>No folders</p>
+{{end}}
