@@ -1,0 +1,31 @@
+
+    <img src="{{.Folder.CoverURL}}" alt="Folder Icon" class="folder-icon">
+    <h2>{{.Folder.Name}}</h2>
+
+    <div class="folder-actions">
+        <button id="add-item-btn" class="addBtn" onclick="location.href='#modal';" >Add New Item</button>
+        <button id="delete-folder-btn" class="danger">Delete Folder</button>
+    </div>
+
+    <div class="items-list">
+        <table>
+            <thead>
+            <tr>
+                <th>Item Name</th>
+                <th>URL</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            {{range .Folder.Items}}
+            <tr>
+                <td>{{.Name}}</td>
+                <td><a href="{{.URL}}" target="_blank">{{.URL}}</a></td>
+                <td>
+                    <button class="delete-item-btn" id="delBtn">Delete</button>
+                </td>
+            </tr>
+            {{end}}
+            </tbody>
+        </table>
+    </div>

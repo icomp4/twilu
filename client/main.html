@@ -23,11 +23,11 @@
         }
 
         nav {
-        display: flex; 
-        justify-content: space-between; 
-        align-items: center;
-        position: relative; /* Needed to position the pseudo-element correctly */
-        padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            padding: 0 20px;
         }
 
         nav::after {
@@ -36,7 +36,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            height: 2px; /* Thickness of the gradient border */
+            height: 2px;
             background: linear-gradient(90deg, rgba(97,67,133,1) 0%, rgba(81,99,149,1) 100%);
         }
 
@@ -62,7 +62,7 @@
             margin: 0 20px;
         }
 
-        a {
+        .homeBtn, .socialBtn, .accBtn, .close {
             transition: transform 300ms ease;
             display: inline-block; 
             margin: 25px; 
@@ -72,7 +72,7 @@
             text-shadow:0 0 15px #000000;
         }
 
-        a:hover {
+        .homeBtn:hover, .socialBtn:hover, .accBtn:hover, .close:hover {
             transform: scale(1.5);
         }
 
@@ -143,6 +143,11 @@
             bottom: 0;
             background: rgba(0, 0, 0, 0.5);
             border-radius: 15px; 
+        }
+        .card-link {
+            transition: none;
+            text-decoration: none;
+            color: inherit;
         }
 
         .text {
@@ -265,9 +270,9 @@
     <nav>
         <h1>Twilu</h1>
         <ul>
-            <li><a href="/main">Home</a></li>
-            <li><a href="/social">Social</a></li>
-            <li><a href="/account">Account</a></li>
+            <li><a class="homeBtn" href="/main">Home</a></li>
+            <li><a class="socialBtn" href="/social">Social</a></li>
+            <li><a class="accBtn"href="/account">Account</a></li>
         </ul>
     </nav>
     <div class="cards-container" hx-get="/api/user/folders" hx-trigger="load">

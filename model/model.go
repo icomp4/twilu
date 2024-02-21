@@ -14,9 +14,9 @@ type User struct {
 	Bio            string
 }
 
-type Picture struct {
+type Item struct {
 	gorm.Model
-	Name     string
+	Name     string `gorm:"not null"`
 	URL      string `gorm:"not null"`
 	FolderID uint
 	OwnerID  uint
@@ -27,8 +27,8 @@ type Folder struct {
 	Name          string
 	Owner         uint
 	OwnerUsername string
-	Contributors  []*User    `gorm:"many2many:folder_contributors;"`
-	Pictures      []*Picture `gorm:"foreignKey:FolderID"`
+	Contributors  []*User `gorm:"many2many:folder_contributors;"`
+	Items         []*Item `gorm:"foreignKey:FolderID"`
 	Private       bool
 	CoverURL      string
 }

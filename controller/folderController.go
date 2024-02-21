@@ -26,9 +26,10 @@ func CreateFolder(folder model.Folder, userID int) error {
 		return nil
 	})
 }
-func AddPictureToFolder(folderID uint, picture model.Picture, userID uint) error {
+func AddItemToFolder(folderID int, item model.Item, userID int) error {
 	return database.DB.Transaction(func(tx *gorm.DB) error {
 		var folder model.Folder
+		userIDUint := uint(userID)
 		if err := tx.First(&folder, folderID).Error; err != nil {
 			return fmt.Errorf("folder not found: %w", err)
 		}
@@ -36,29 +37,30 @@ func AddPictureToFolder(folderID uint, picture model.Picture, userID uint) error
 		if err := tx.First(&user, userID).Error; err != nil {
 			return fmt.Errorf("user not found: %w", err)
 		}
-		if folder.Owner != userID {
+		if folder.Owner != userIDUint {
 			return fmt.Errorf("user does not have permission to do that")
 		}
-		picture.OwnerID = userID
-		picture.FolderID = folder.ID
-		if err := tx.Create(&picture).Error; err != nil {
+		item.OwnerID = userIDUint
+		item.FolderID = folder.ID
+		if err := tx.Create(&item).Error; err != nil {
 			return fmt.Errorf("failed to create picture: %w", err)
 		}
 		return nil
 	})
 }
 
-func AddContributer(folderID uint, userID uint, newUserID uint) error {
+func AddContributer(folderID int, userID int, newUserID int) error {
 	return database.DB.Transaction(func(tx *gorm.DB) error {
 		var folder model.Folder
 		var newUser model.User
+		folderIDUint := uint(folderID)
 		if err := tx.First(&folder, folderID).Error; err != nil {
 			return fmt.Errorf("folder not found: %w", err)
 		}
 		if err := tx.First(&newUser, newUserID).Error; err != nil {
 			return fmt.Errorf("new user not found: %w", err)
 		}
-		if folder.Owner != userID {
+		if folder.Owner != folderIDUint {
 			return fmt.Errorf("user does not have permission to do that")
 		}
 		if err := tx.Model(&folder).Association("Contributors").Append(&newUser); err != nil {
@@ -67,10 +69,33 @@ func AddContributer(folderID uint, userID uint, newUserID uint) error {
 		return nil
 	})
 }
-func GetFolder(folderID uint) (model.Folder, error) {
+func GetFolder(folderID int) (model.Folder, error) {
 	var folder model.Folder
-	if err := database.DB.Model(&folder).Preload("Contributors").Preload("Pictures").Find(&folder, folderID).Error; err != nil {
+	if err := database.DB.Model(&folder).Preload("Contributors").Preload("Items").Find(&folder, folderID).Error; err != nil {
 		return model.Folder{}, err
 	}
 	return folder, nil
+}
+
+func DeleteFolder(folderID int, userID int) error {
+	return database.DB.Transaction(func(tx *gorm.DB) error {
+		var user model.User
+		var folder model.Folder
+		if err := tx.First(&user, userID).Error; err != nil {
+			return fmt.Errorf("user not found: %w", err)
+		}
+		if err := tx.First(&folder, folderID).Error; err != nil {
+			return fmt.Errorf("folder not found: %w", err)
+		}
+		if userID != int(folder.Owner) {
+			return fmt.Errorf("user is not the owner")
+		}
+		if err := tx.Unscoped().Delete(&model.Item{}).Where("FolderID = ?", folderID).Error; err != nil {
+			return fmt.Errorf("unable to delete items: %w", err)
+		}
+		if err := tx.Unscoped().Delete(&folder).Error; err != nil {
+			return fmt.Errorf("unable to delete folder: %w", err)
+		}
+		return nil
+	})
 }

@@ -23,5 +23,5 @@ func StartDB() {
 	if err != nil {
 		log.Fatal("Error connecting to database")
 	}
-	DB.AutoMigrate(&model.User{}, &model.Folder{}, &model.Picture{})
+	DB.AutoMigrate(&model.User{}, &model.Folder{}, &model.Item{})
 }

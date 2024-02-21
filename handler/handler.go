@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strconv"
 	"twilu/controller"
 	"twilu/model"
 	"twilu/util"
@@ -157,6 +158,39 @@ func GetFolders(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 }
+func GetFolder(w http.ResponseWriter, r *http.Request) {
+	_, err := Store.Get(r, "twilu-cookie")
+	if err != nil {
+		http.Error(w, "Bad session", http.StatusBadGateway)
+		return
+	}
+	folderID, err := strconv.Atoi(r.PathValue("id"))
+	if err != nil {
+		http.Error(w, "unable to find folder", http.StatusBadRequest)
+		return
+	}
+	folder, err := controller.GetFolder(folderID)
+	if err != nil {
+		http.Error(w, "unable to find folder", http.StatusBadRequest)
+		return
+	}
+	type TemplateData struct {
+		Folder model.Folder // Assuming Folder is the struct type
+	}
+	tmplData := TemplateData{Folder: folder}
+	tmplPath := filepath.Join("templates", "folder.html")
+	tmpl, err := template.ParseFiles(tmplPath)
+	if err != nil {
+		http.Error(w, "Unable to load template", http.StatusInternalServerError)
+		return
+	}
+	w.Header().Set("Content-Type", "text/html")
+	err = tmpl.Execute(w, tmplData)
+	if err != nil {
+		log.Println("Unable to execute template")
+		return
+	}
+}
 func CreateFolder(w http.ResponseWriter, r *http.Request) {
 	if err := r.ParseForm(); err != nil {
 		http.Error(w, "Error parsing the form", http.StatusInternalServerError)
@@ -192,6 +226,36 @@ func CreateFolder(w http.ResponseWriter, r *http.Request) {
 	create := controller.CreateFolder(folder, userIDInt)
 	if create != nil {
 		http.Error(w, "Failed to create folder", http.StatusBadRequest)
+		return
+	}
+	w.Header().Set("HX-Redirect", "/main")
+	w.WriteHeader(http.StatusAccepted)
+}
+func DeleteFolder(w http.ResponseWriter, r *http.Request) {
+	sess, err := Store.Get(r, "twilu-cookie")
+	if err != nil {
+		http.Error(w, "Bad session", http.StatusBadGateway)
+		return
+	}
+	userID, ok := sess.Values["userID"]
+	if !ok {
+		http.Error(w, "User ID not found in session", http.StatusBadRequest)
+		return
+	}
+
+	userIDInt, ok := userID.(int)
+	if !ok {
+		http.Error(w, "User ID is of invalid type", http.StatusBadRequest)
+		return
+	}
+
+	folderID, err := strconv.Atoi(r.PathValue("id"))
+	if err != nil {
+		http.Error(w, "unable to convert id", http.StatusBadGateway)
+		return
+	}
+	if err := controller.DeleteFolder(folderID, userIDInt); err != nil {
+		http.Error(w, "failed to delete folder", http.StatusBadGateway)
 		return
 	}
 	w.Header().Set("HX-Redirect", "/main")

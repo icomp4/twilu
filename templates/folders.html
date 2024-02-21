@@ -1,5 +1,6 @@
 {{if .HasFolders}}
-    {{range .Folders}}
+{{range .Folders}}
+<a href="/folder/{{.ID}}" class="card-link">
     <div class="card" style="background-image: url('{{.CoverURL}}');">
         <div class="card-overlay">
             <div class="text">
@@ -8,7 +9,8 @@
             </div>
         </div>
     </div>
-    {{end}}
+</a>
+{{end}}
 {{else}}
-    <p>No folders</p>
+<p>No folders</p>
 {{end}}
