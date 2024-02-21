@@ -48,7 +48,6 @@ func AddItemToFolder(folderID int, item model.Item, userID int) error {
 		return nil
 	})
 }
-
 func AddContributer(folderID int, userID int, newUserID int) error {
 	return database.DB.Transaction(func(tx *gorm.DB) error {
 		var folder model.Folder
@@ -76,7 +75,6 @@ func GetFolder(folderID int) (model.Folder, error) {
 	}
 	return folder, nil
 }
-
 func DeleteFolder(folderID int, userID int) error {
 	return database.DB.Transaction(func(tx *gorm.DB) error {
 		var user model.User
@@ -95,6 +93,29 @@ func DeleteFolder(folderID int, userID int) error {
 		}
 		if err := tx.Unscoped().Delete(&folder).Error; err != nil {
 			return fmt.Errorf("unable to delete folder: %w", err)
+		}
+		return nil
+	})
+}
+func DeleteItem(folderID int, userID int, itemID int) error {
+	return database.DB.Transaction(func(tx *gorm.DB) error {
+		var user model.User
+		var folder model.Folder
+		var item model.Item
+		if err := tx.First(&user, userID).Error; err != nil {
+			return fmt.Errorf("user not found: %w", err)
+		}
+		if err := tx.First(&folder, folderID).Error; err != nil {
+			return fmt.Errorf("folder not found: %w", err)
+		}
+		if err := tx.First(&item, itemID).Error; err != nil {
+			return fmt.Errorf("item not found: %w", err)
+		}
+		if userID != int(item.OwnerID) {
+			return fmt.Errorf("user is not the owner")
+		}
+		if err := tx.Unscoped().Delete(&item).Error; err != nil {
+			return fmt.Errorf("unable to delete item: %w", err)
 		}
 		return nil
 	})

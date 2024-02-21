@@ -35,7 +35,6 @@ func SignUp(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Error parsing the form", http.StatusInternalServerError)
 		return
 	}
-
 	var user model.User
 	user.Username = r.PostFormValue("username")
 	user.Email = r.PostFormValue("email")
@@ -259,5 +258,81 @@ func DeleteFolder(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.Header().Set("HX-Redirect", "/main")
+	w.WriteHeader(http.StatusAccepted)
+}
+func AddItem(w http.ResponseWriter, r *http.Request) {
+	if err := r.ParseForm(); err != nil {
+		http.Error(w, "Error parsing the form", http.StatusInternalServerError)
+		return
+	}
+
+	var item model.Item
+	item.Name = r.PostFormValue("itemName")
+	item.URL = r.PostFormValue("itemUrl")
+
+	sess, err := Store.Get(r, "twilu-cookie")
+	if err != nil {
+		http.Error(w, "Bad session", http.StatusBadGateway)
+		return
+	}
+
+	userID, ok := sess.Values["userID"]
+	if !ok {
+		http.Error(w, "User ID not found in session", http.StatusBadRequest)
+		return
+	}
+
+	userIDInt, ok := userID.(int)
+	if !ok {
+		http.Error(w, "User ID is of invalid type", http.StatusBadRequest)
+		return
+	}
+	folderID, err := strconv.Atoi(r.PathValue("id"))
+	if err != nil {
+		http.Error(w, "unable to convert id", http.StatusBadGateway)
+		return
+	}
+	if err := controller.AddItemToFolder(folderID, item, userIDInt); err != nil {
+		http.Error(w, "unable to convert id", http.StatusBadGateway)
+		return
+	}
+	url := "/folder/" + fmt.Sprint(folderID)
+	w.Header().Set("HX-Redirect", url)
+	w.WriteHeader(http.StatusAccepted)
+}
+func DeleteItem(w http.ResponseWriter, r *http.Request) {
+	sess, err := Store.Get(r, "twilu-cookie")
+	if err != nil {
+		http.Error(w, "Bad session", http.StatusBadGateway)
+		return
+	}
+	userID, ok := sess.Values["userID"]
+	if !ok {
+		http.Error(w, "User ID not found in session", http.StatusBadRequest)
+		return
+	}
+
+	userIDInt, ok := userID.(int)
+	if !ok {
+		http.Error(w, "User ID is of invalid type", http.StatusBadRequest)
+		return
+	}
+
+	folderID, err := strconv.Atoi(r.PathValue("id"))
+	if err != nil {
+		http.Error(w, "unable to convert id", http.StatusBadGateway)
+		return
+	}
+	itemID, err := strconv.Atoi(r.PathValue("itemID"))
+	if err != nil {
+		http.Error(w, "unable to convert id", http.StatusBadGateway)
+		return
+	}
+	if err := controller.DeleteItem(folderID, userIDInt, itemID); err != nil {
+		http.Error(w, "unable to delete item", http.StatusBadGateway)
+		return
+	}
+	url := "/folder/" + fmt.Sprint(folderID)
+	w.Header().Set("HX-Redirect", url)
 	w.WriteHeader(http.StatusAccepted)
 }

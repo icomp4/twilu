@@ -1,5 +1,5 @@
 
-    <img src="{{.Folder.CoverURL}}" alt="Folder Icon" class="folder-icon">
+<img src="{{.Folder.CoverURL}}" alt="Folder Icon" class="folder-icon">
     <h2>{{.Folder.Name}}</h2>
 
     <div class="folder-actions">
@@ -7,25 +7,68 @@
         <button id="delete-folder-btn" class="danger">Delete Folder</button>
     </div>
 
-    <div class="items-list">
-        <table>
-            <thead>
-            <tr>
-                <th>Item Name</th>
-                <th>URL</th>
-                <th>Actions</th>
-            </tr>
-            </thead>
-            <tbody>
-            {{range .Folder.Items}}
-            <tr>
-                <td>{{.Name}}</td>
-                <td><a href="{{.URL}}" target="_blank">{{.URL}}</a></td>
-                <td>
-                    <button class="delete-item-btn" id="delBtn">Delete</button>
-                </td>
-            </tr>
-            {{end}}
-            </tbody>
-        </table>
+<div class="items-list">
+    <table>
+        <thead>
+        <tr>
+            <th>Item Name</th>
+            <th>URL</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        {{with .Folder}}
+        {{range .Items}}
+        <tr>
+            <td>{{.Name}}</td>
+            <td><a href="{{.URL}}" target="_blank">{{.URL}}</a></td>
+            <td>
+                <button class="delete-item-btn" id="delBtn" hx-delete="/api/folder/{{$.Folder.ID}}/item/{{.ID}}">Delete</button>
+            </td>
+        </tr>
+        {{end}}
+        {{end}}
+        </tbody>
+    </table>
+</div>
+
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <a href="#" class="close">&times;</a>
+            <form class="form">
+                <label for="itemName">Item Name:</label>
+                <input type="text" id="itemName" name="itemName" placeholder="Enter name" required>
+
+                <label for="itemURL">Item URL:</label>
+                <input type="url" id="itemUrl" name="itemUrl" placeholder="http://example.com/cover.jpg">
+
+                <button type="submit" class="submitBtn" hx-post="/api/folder/{{.Folder.ID}}/add">Add Item</button>
+            </form>
+        </div>
     </div>
+    <script>
+        var modal = document.getElementById('modal');
+        modal.style.display = "none";
+
+        var btn = document.querySelector('.addBtn');
+
+        var span = document.getElementsByClassName('close')[0];
+
+        btn.onclick = function() {
+            modal.style.display = "flex";
+        }
+
+        span.onclick = function() {
+            modal.style.display = "none";
+        }
+
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
+        span.onclick = function(event) {
+            event.preventDefault();
+            modal.style.display = "none";
+        }
+    </script>

@@ -249,19 +249,45 @@
 <div id="folderContainer" class="container" hx-trigger="load">
     <p>Loading...</p>
 </div>
-<button class="logout" hx-post="/api/logout">Log out</button>
 
+
+<button class="logout" hx-post="/api/logout">Log out</button>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const urlParts = window.location.pathname.split('/');
-        const folderID = urlParts[urlParts.length - 1]; // Assuming the ID is the last part of the URL
+        const folderID = urlParts[urlParts.length - 1];
         const endpoint = `/api/folder/${folderID}`;
 
-        // Directly make an HTMX request
         if (htmx) {
             htmx.ajax('GET', endpoint, '#folderContainer');
         }
     });
+</script>
+<script>
+    var modal = document.getElementById('modal');
+    modal.style.display = "none";
+
+    var btn = document.querySelector('.addBtn');
+
+    var span = document.getElementsByClassName('close')[0];
+
+    btn.onclick = function() {
+        modal.style.display = "flex";
+    }
+
+    span.onclick = function() {
+        modal.style.display = "none";
+    }
+
+    window.onclick = function(event) {
+        if (event.target == modal) {
+            modal.style.display = "none";
+        }
+    }
+    span.onclick = function(event) {
+        event.preventDefault();
+        modal.style.display = "none";
+    }
 </script>
 </body>
 </html>

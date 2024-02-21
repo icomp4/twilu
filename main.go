@@ -60,6 +60,9 @@ func main() {
 	mux.HandleFunc("GET /api/user/folders", handler.GetFolders)
 	mux.HandleFunc("POST /api/folder/create", handler.CreateFolder)
 	mux.HandleFunc("GET /api/folder/{id}", handler.GetFolder)
+	mux.HandleFunc("DELETE /api/folder/{id}", handler.DeleteFolder)
+	mux.HandleFunc("POST /api/folder/{id}/add", handler.AddItem)
+	mux.HandleFunc("DELETE /api/folder/{id}/item/{itemID}", handler.DeleteItem)
 
 	log.Fatal(http.ListenAndServe(":8080", mux))
 }
