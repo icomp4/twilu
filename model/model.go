@@ -24,11 +24,11 @@ type Picture struct {
 
 type Folder struct {
 	gorm.Model
-	Name string
-	Owner uint
+	Name          string
+	Owner         uint
 	OwnerUsername string
-	Contributers []*User `gorm:"many2many:folder_contributers;"`
-	Pictures []*Picture `gorm:"foreignKey:FolderID"`
-	Private  bool
-	CoverURL string
+	Contributors  []*User    `gorm:"many2many:folder_contributors;"`
+	Pictures      []*Picture `gorm:"foreignKey:FolderID"`
+	Private       bool
+	CoverURL      string
 }

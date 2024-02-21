@@ -16,13 +16,18 @@ import (
 	"github.com/joho/godotenv"
 )
 
-func init() {
+var Store *sessions.CookieStore
+
+func Init() {
 	if err := godotenv.Load(); err != nil {
 		log.Print("No .env file found")
 	}
+	sessionKey := os.Getenv("SESSION_KEY")
+	if sessionKey == "" {
+		log.Fatal("SESSION_KEY is not set")
+	}
+	Store = sessions.NewCookieStore([]byte(sessionKey))
 }
-var sessionKey = os.Getenv("SESSION_KEY")
-var Store = sessions.NewCookieStore([]byte(sessionKey))
 
 func SignUp(w http.ResponseWriter, r *http.Request) {
 	if err := r.ParseForm(); err != nil {

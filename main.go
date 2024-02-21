@@ -10,11 +10,12 @@ import (
 
 func main() {
 	database.StartDB()
+	handler.Init()
 	mux := http.NewServeMux()
 	mux.Handle("/client/", http.StripPrefix("/client/", http.FileServer(http.Dir("./client"))))
 
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		sess, _ := handler.Store.Get(r,"twilu-cookie")
+		sess, _ := handler.Store.Get(r, "twilu-cookie")
 		if auth, ok := sess.Values["authenticated"].(bool); ok && auth {
 			http.Redirect(w, r, "/main", http.StatusFound)
 			return
@@ -31,7 +32,7 @@ func main() {
 		}
 	})
 	mux.HandleFunc("/main", func(w http.ResponseWriter, r *http.Request) {
-		sess, _ := handler.Store.Get(r,"twilu-cookie")
+		sess, _ := handler.Store.Get(r, "twilu-cookie")
 		if auth, ok := sess.Values["authenticated"].(bool); !ok || !auth {
 			http.Redirect(w, r, "/", http.StatusFound)
 			return
@@ -46,7 +47,6 @@ func main() {
 	mux.HandleFunc("POST /api/logout", handler.Logout)
 	mux.HandleFunc("GET /api/user/folders", handler.GetFolders)
 	mux.HandleFunc("POST /api/folder/create", handler.CreateFolder)
-
 
 	log.Fatal(http.ListenAndServe(":8080", mux))
 }

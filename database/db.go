@@ -18,7 +18,7 @@ func StartDB() {
 		log.Print("No .env file found")
 	}
 	dbURL := os.Getenv("DB_URL")
-	
+
 	DB, err = gorm.Open(postgres.Open(dbURL), &gorm.Config{})
 	if err != nil {
 		log.Fatal("Error connecting to database")
