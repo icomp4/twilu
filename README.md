@@ -2,7 +2,7 @@
 
 Welcome to Twilu, the intuitive web application designed to help you declutter your digital space by organizing links efficiently. With Twilu, you can easily manage a myriad of URLs by creating personalized folders, adding links to these folders, and maintaining your digital space with ease. Whether you're a researcher, student, or just someone looking to keep their favorite sites organized, Twilu is tailored for you.
 Features
-[![Twilu Demo]]([https://www.loom.com/share/yourvideoid](https://www.loom.com/share/7179132c5d1c475b9da83d39d5d32f91))
+[Twilu Demo](https://www.loom.com/share/7179132c5d1c475b9da83d39d5d32f91)
 
 # Twilu offers a comprehensive set of features designed for optimal user experience:
 
