@@ -1,9 +1,9 @@
-Twilu - A Link Organizer Web App
+# Twilu - A Link Organizer Web App
 
 Welcome to Twilu, the intuitive web application designed to help you declutter your digital space by organizing links efficiently. With Twilu, you can easily manage a myriad of URLs by creating personalized folders, adding links to these folders, and maintaining your digital space with ease. Whether you're a researcher, student, or just someone looking to keep their favorite sites organized, Twilu is tailored for you.
 Features
 
-Twilu offers a comprehensive set of features designed for optimal user experience:
+# Twilu offers a comprehensive set of features designed for optimal user experience:
 
     User Accounts: Securely sign up and manage your personal account.
     Sign In: Access your saved links and folders anytime, anywhere.
@@ -11,9 +11,9 @@ Twilu offers a comprehensive set of features designed for optimal user experienc
     Link Organization: Add new links to folders, ensuring your digital space is always organized.
     Link Deletion: Remove links that are no longer needed, keeping your folders clean and relevant.
 
-Technology Stack
+# Technology Stack
 
-Twilu is built using a robust and modern technology stack, ensuring a smooth and responsive experience:
+# Twilu is built using a robust and modern technology stack, ensuring a smooth and responsive experience:
 
     Backend: The core logic of Twilu is powered by Go, offering fast and reliable performance.
     ORM: Gorm is utilized for object-relational mapping, simplifying database operations.
