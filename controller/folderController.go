@@ -79,18 +79,29 @@ func DeleteFolder(folderID int, userID int) error {
 	return database.DB.Transaction(func(tx *gorm.DB) error {
 		var user model.User
 		var folder model.Folder
+
 		if err := tx.First(&user, userID).Error; err != nil {
 			return fmt.Errorf("user not found: %w", err)
 		}
 		if err := tx.First(&folder, folderID).Error; err != nil {
 			return fmt.Errorf("folder not found: %w", err)
 		}
+		// Check if the user is the owner of the folder
 		if userID != int(folder.Owner) {
 			return fmt.Errorf("user is not the owner")
 		}
-		if err := tx.Unscoped().Delete(&model.Item{}).Where("FolderID = ?", folderID).Error; err != nil {
+
+		if err := tx.Model(&folder).Association("Contributors").Clear(); err != nil {
+			return fmt.Errorf("unable to clear folder contributors: %w", err)
+		}
+
+		if err := tx.Model(&user).Association("Folders").Delete(&folder); err != nil {
+			return fmt.Errorf("unable to remove folder from user's folders: %w", err)
+		}
+		if err := tx.Where("Folder_ID = ?", folderID).Unscoped().Delete(&model.Item{}).Error; err != nil {
 			return fmt.Errorf("unable to delete items: %w", err)
 		}
+
 		if err := tx.Unscoped().Delete(&folder).Error; err != nil {
 			return fmt.Errorf("unable to delete folder: %w", err)
 		}
