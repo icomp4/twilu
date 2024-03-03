@@ -1,6 +1,7 @@
 
 <img src="{{.Folder.CoverURL}}" alt="Folder Icon" class="folder-icon">
     <h2>{{.Folder.Name}}</h2>
+   <h4>@{{.Folder.OwnerUsername}}</h4>
 
     <div class="folder-actions">
         <button id="add-item-btn" class="addBtn" onclick="location.href='#modal';" >Add New Item</button>
@@ -46,14 +47,14 @@
             </form>
         </div>
     </div>
-<div id="delModal" class="modal">
+<div id="delModal" class="delModal">
     <div class="del-modal-contents">
         <a href="#" class="close" id="closeDelModal">&times;</a>
         <form class="form">
             <label for="itemName">Are you sure you want to delete this folder?</label>
             <button type="submit" class="delBtn" hx-delete="/api/folder/{{.Folder.ID}}">Delete Folder</button>
+        </form>
     </div>
-</div>
     <script>
         var addModal = document.getElementById('modal');
         var addBtn = document.querySelector('.addBtn');

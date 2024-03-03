@@ -54,6 +54,18 @@ func main() {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
 	})
+	mux.HandleFunc("/social", func(w http.ResponseWriter, r *http.Request) {
+		sess, _ := handler.Store.Get(r, "twilu-cookie")
+		if auth, ok := sess.Values["authenticated"].(bool); !ok || !auth {
+			http.Redirect(w, r, "/", http.StatusFound)
+			return
+		}
+
+		templates := template.Must(template.ParseFiles("client/socialPage.html"))
+		if err := templates.ExecuteTemplate(w, "socialPage.html", nil); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+	})
 	mux.HandleFunc("POST /api/signup", handler.SignUp)
 	mux.HandleFunc("POST /api/login", handler.LogIn)
 	mux.HandleFunc("POST /api/logout", handler.Logout)
@@ -63,6 +75,7 @@ func main() {
 	mux.HandleFunc("DELETE /api/folder/{id}", handler.DeleteFolder)
 	mux.HandleFunc("POST /api/folder/{id}/add", handler.AddItem)
 	mux.HandleFunc("DELETE /api/folder/{id}/item/{itemID}", handler.DeleteItem)
+	mux.HandleFunc("GET /api/feed", handler.GetFeed)
 
 	log.Fatal(http.ListenAndServe(":8080", mux))
 }

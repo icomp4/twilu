@@ -12,7 +12,7 @@
 <nav>
   <h1>Twilu</h1>
 </nav>
-    <form class="form" hx-post="/login" method="post">
+    <form class="form">
       <p class="form-title">Sign in to your account</p>
       <div class="input-container">
           <input type="text" name="username" placeholder="Enter username">
@@ -21,11 +21,11 @@
       <div class="input-container">
           <input type="password" name="password" placeholder="Enter password">
       </div>
-      <button type="submit" class="submit" hx-post="/api/login" hx-target="#errorLabel">
+      <button class="submit" hx-post="/api/login" hx-target="#errorLabel">
       Login
       </button>
       <div class="error-container">
-        <div id="errorLabel"></div>
+        <div id="errorLabel" name="errorLabel" class="errorLabel"></div>
       </div>
       <p class="signup-link">
       No account?
@@ -185,6 +185,11 @@ button:focus-visible {
     
     .signup-link a {
     text-decoration: underline;
+    }
+
+    .errorLabel{
+      color: rgb(226, 66, 66);
+
     }
     </style>
 </body>

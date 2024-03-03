@@ -131,3 +131,10 @@ func DeleteItem(folderID int, userID int, itemID int) error {
 		return nil
 	})
 }
+func GetFeed() ([]model.Folder, error) {
+	var folders []model.Folder
+	if err := database.DB.Model(&model.Folder{}).Where("Private = ?", false).Find(&folders).Error; err != nil {
+		return []model.Folder{}, err
+	}
+	return folders, nil
+}

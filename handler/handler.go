@@ -28,6 +28,12 @@ func Init() {
 		log.Fatal("SESSION_KEY is not set")
 	}
 	Store = sessions.NewCookieStore([]byte(sessionKey))
+	Store.Options = &sessions.Options{
+		Path:     "/",
+		MaxAge:   3600 * 24,
+		HttpOnly: true,
+		SameSite: http.SameSiteStrictMode,
+	}
 }
 
 func SignUp(w http.ResponseWriter, r *http.Request) {
@@ -79,7 +85,6 @@ func LogIn(w http.ResponseWriter, r *http.Request) {
 
 	userInfo, err := controller.SignIn(user)
 	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
 		io.WriteString(w, "Incorrect login info")
 		return
 	}
@@ -150,6 +155,46 @@ func GetFolders(w http.ResponseWriter, r *http.Request) {
 		HasFolders: len(folders) > 0,
 	}
 
+	w.Header().Set("Content-Type", "text/html")
+	err = tmpl.Execute(w, data)
+	if err != nil {
+		http.Error(w, "Unable to execute template", http.StatusInternalServerError)
+		return
+	}
+}
+func GetFeed(w http.ResponseWriter, r *http.Request) {
+	sess, err := Store.Get(r, "twilu-cookie")
+	if err != nil {
+		http.Error(w, "Bad session", http.StatusBadGateway)
+		return
+	}
+
+	_, ok := sess.Values["userID"]
+	if !ok {
+		http.Error(w, "User ID not found in session", http.StatusBadRequest)
+		return
+	}
+
+	folders, err := controller.GetFeed()
+	if err != nil {
+		http.Error(w, "Unable to get folders", http.StatusInternalServerError)
+		return
+	}
+
+	tmplPath := filepath.Join("templates", "social.html")
+	tmpl, err := template.ParseFiles(tmplPath)
+	if err != nil {
+		http.Error(w, "Unable to load template", http.StatusInternalServerError)
+		return
+	}
+
+	data := struct {
+		Folders    []model.Folder
+		HasFolders bool
+	}{
+		Folders:    folders,
+		HasFolders: len(folders) > 0,
+	}
 	w.Header().Set("Content-Type", "text/html")
 	err = tmpl.Execute(w, data)
 	if err != nil {
