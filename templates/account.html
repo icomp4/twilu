@@ -1,0 +1,12 @@
+<div class="accountArea">
+    <form method="post">
+        <img class="avi" src="{{.ProfilePicture}}">
+        <div class="username">@{{.Username}}</div>
+        <label>email: {{.Email}}</label>
+        <input type="password" name="currentPassword" placeholder="current password">
+        <input type="password" name="newPassword" placeholder="new password">
+        <button type="submit" hx-post="/api/password/update" hx-target="#response-message" hx-swap="innerHTML" >Confirm Password Change</button>
+        <button type="button">Delete Account</button>
+    </form>
+    <div id="response-message"></div>
+</div>

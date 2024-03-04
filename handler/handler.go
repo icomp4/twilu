@@ -58,7 +58,7 @@ func SignUp(w http.ResponseWriter, r *http.Request) {
 		io.WriteString(w, "Please choose a stronger password")
 		return
 	}
-
+	user.ProfilePicture = "https://www.testhouse.net/wp-content/uploads/2021/11/default-avatar.jpg"
 	if err := controller.CreateAccount(user); err != nil {
 		io.WriteString(w, "Email or username already in use")
 		return
@@ -66,7 +66,6 @@ func SignUp(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("HX-Redirect", "/login")
 	w.WriteHeader(http.StatusAccepted)
 }
-
 func LogIn(w http.ResponseWriter, r *http.Request) {
 	sess, err := Store.Get(r, "twilu-cookie")
 	if err != nil {
@@ -161,6 +160,80 @@ func GetFolders(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Unable to execute template", http.StatusInternalServerError)
 		return
 	}
+}
+func GetUser(w http.ResponseWriter, r *http.Request) {
+	sess, err := Store.Get(r, "twilu-cookie")
+	if err != nil {
+		http.Error(w, "Bad session", http.StatusBadGateway)
+		return
+	}
+
+	userID, ok := sess.Values["userID"]
+	if !ok {
+		http.Error(w, "User ID not found in session", http.StatusBadRequest)
+		return
+	}
+
+	userIDInt, ok := userID.(int)
+	if !ok {
+		http.Error(w, "User ID is of invalid type", http.StatusBadRequest)
+		return
+	}
+
+	user, err := controller.GetUserByID(userIDInt)
+	if err != nil {
+		http.Error(w, "Unable to get folders", http.StatusInternalServerError)
+		return
+	}
+
+	tmplPath := filepath.Join("templates", "account.html")
+	tmpl, err := template.ParseFiles(tmplPath)
+	if err != nil {
+		http.Error(w, "Unable to load template", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "text/html")
+	err = tmpl.Execute(w, user)
+	if err != nil {
+		http.Error(w, "Unable to execute template", http.StatusInternalServerError)
+		return
+	}
+}
+func UpdatePassword(w http.ResponseWriter, r *http.Request) {
+	sess, err := Store.Get(r, "twilu-cookie")
+	if err != nil {
+		http.Error(w, "Bad session", http.StatusBadGateway)
+		return
+	}
+	if err := r.ParseForm(); err != nil {
+		http.Error(w, "Error parsing the form", http.StatusInternalServerError)
+		return
+	}
+	currentPw := r.PostFormValue("currentPassword")
+	newPw := r.PostFormValue("newPassword")
+	userID, ok := sess.Values["userID"]
+	if !ok {
+		http.Error(w, "User ID not found in session", http.StatusBadRequest)
+		return
+	}
+
+	userIDInt, ok := userID.(int)
+	if !ok {
+		http.Error(w, "User ID is of invalid type", http.StatusBadRequest)
+		return
+	}
+
+	err2 := controller.UpdatePassword(userIDInt, currentPw, newPw)
+	if err2 != nil {
+		fmt.Fprint(w, "<div class='error'>Unable to update password.</div>")
+		return
+	}
+	fmt.Fprint(w, "<div class='success'>Password successfully updated.</div>")
+
+	w.Header().Set("HX-Redirect", "/account")
+	w.WriteHeader(http.StatusAccepted)
+
 }
 func GetFeed(w http.ResponseWriter, r *http.Request) {
 	sess, err := Store.Get(r, "twilu-cookie")

@@ -11,7 +11,6 @@ type User struct {
 	Password       string    `gorm:"not null"`
 	Folders        []*Folder `gorm:"many2many:user_folders;"`
 	ProfilePicture string
-	Bio            string
 }
 
 type Item struct {

@@ -1,12 +1,13 @@
 package controller
 
 import (
+	"fmt"
+	"golang.org/x/crypto/bcrypt"
 	"log"
 	"strings"
 	"twilu/database"
 	"twilu/model"
-
-	"golang.org/x/crypto/bcrypt"
+	"twilu/util"
 )
 
 func CreateAccount(user model.User) error {
@@ -57,4 +58,27 @@ func GetUserFoldersByID(userID int) ([]model.Folder, error) {
 		return []model.Folder{}, err
 	}
 	return folders, nil
+}
+
+func UpdatePassword(userID int, currentPw string, newPw string) error {
+	var user model.User
+	if err := database.DB.First(&user, userID).Error; err != nil {
+		return err
+	}
+	if util.PasswordIsValid(currentPw) == false {
+		return fmt.Errorf("invalid password")
+	}
+	err2 := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(currentPw))
+	if err2 != nil {
+		return err2
+	}
+	password, err := bcrypt.GenerateFromPassword([]byte(newPw), bcrypt.DefaultCost)
+	if err != nil {
+		return err
+	}
+	user.Password = string(password)
+	if err := database.DB.Save(&user).Error; err != nil {
+		return err
+	}
+	return nil
 }
