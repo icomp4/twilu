@@ -23,7 +23,7 @@ func NewUserHandler(store *sessions.CookieStore, controller *controller.UserCont
 		controller: controller}
 }
 
-func (u *UserHandler) SignUp(w http.ResponseWriter, r *http.Request) {
+func (uh *UserHandler) SignUp(w http.ResponseWriter, r *http.Request) {
 	if err := r.ParseForm(); err != nil {
 		http.Error(w, "Error parsing the form", http.StatusInternalServerError)
 		return
@@ -46,15 +46,15 @@ func (u *UserHandler) SignUp(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	user.ProfilePicture = "https://www.testhouse.net/wp-content/uploads/2021/11/default-avatar.jpg"
-	if err := u.controller.CreateAccount(user); err != nil {
+	if err := uh.controller.CreateAccount(user); err != nil {
 		io.WriteString(w, "Email or username already in use")
 		return
 	}
 	w.Header().Set("HX-Redirect", "/login")
 	w.WriteHeader(http.StatusAccepted)
 }
-func (u *UserHandler) Login(w http.ResponseWriter, r *http.Request) {
-	sess, err := u.store.Get(r, "twilu-cookie")
+func (uh *UserHandler) Login(w http.ResponseWriter, r *http.Request) {
+	sess, err := uh.store.Get(r, "twilu-cookie")
 	if err != nil {
 		http.Error(w, "Failed to retrieve session", http.StatusInternalServerError)
 		return
@@ -68,7 +68,7 @@ func (u *UserHandler) Login(w http.ResponseWriter, r *http.Request) {
 	user.Username = r.PostFormValue("username")
 	user.Password = r.PostFormValue("password")
 
-	userInfo, err := u.controller.SignIn(user)
+	userInfo, err := uh.controller.SignIn(user)
 	if err != nil {
 		io.WriteString(w, "Incorrect login info")
 		return
@@ -79,8 +79,8 @@ func (u *UserHandler) Login(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("HX-Redirect", "/main")
 	w.WriteHeader(http.StatusAccepted)
 }
-func (u *UserHandler) Logout(w http.ResponseWriter, r *http.Request) {
-	sess, err := u.store.Get(r, "twilu-cookie")
+func (uh *UserHandler) Logout(w http.ResponseWriter, r *http.Request) {
+	sess, err := uh.store.Get(r, "twilu-cookie")
 	if err != nil {
 		io.WriteString(w, "Bad session")
 		w.WriteHeader(http.StatusBadGateway)
@@ -100,8 +100,8 @@ func (u *UserHandler) Logout(w http.ResponseWriter, r *http.Request) {
 	}
 	fmt.Fprintf(w, `<script>window.location.href = "/";</script>`)
 }
-func (u *UserHandler) GetUser(w http.ResponseWriter, r *http.Request) {
-	sess, err := u.store.Get(r, "twilu-cookie")
+func (uh *UserHandler) GetUser(w http.ResponseWriter, r *http.Request) {
+	sess, err := uh.store.Get(r, "twilu-cookie")
 	if err != nil {
 		http.Error(w, "Bad session", http.StatusBadGateway)
 		return
@@ -119,7 +119,7 @@ func (u *UserHandler) GetUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user, err := u.controller.GetUserByID(userIDInt)
+	user, err := uh.controller.GetUserByID(userIDInt)
 	if err != nil {
 		http.Error(w, "Unable to get folders", http.StatusInternalServerError)
 		return
@@ -139,8 +139,8 @@ func (u *UserHandler) GetUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 }
-func (u *UserHandler) GetFolders(w http.ResponseWriter, r *http.Request) {
-	sess, err := u.store.Get(r, "twilu-cookie")
+func (uh *UserHandler) GetFolders(w http.ResponseWriter, r *http.Request) {
+	sess, err := uh.store.Get(r, "twilu-cookie")
 	if err != nil {
 		http.Error(w, "Bad session", http.StatusBadGateway)
 		return
@@ -158,7 +158,7 @@ func (u *UserHandler) GetFolders(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	folders, err := u.controller.GetUserFoldersByID(userIDInt)
+	folders, err := uh.controller.GetUserFoldersByID(userIDInt)
 	if err != nil {
 		http.Error(w, "Unable to get folders", http.StatusInternalServerError)
 		return
@@ -186,8 +186,8 @@ func (u *UserHandler) GetFolders(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 }
-func (u *UserHandler) UpdatePassword(w http.ResponseWriter, r *http.Request) {
-	sess, err := u.store.Get(r, "twilu-cookie")
+func (uh *UserHandler) UpdatePassword(w http.ResponseWriter, r *http.Request) {
+	sess, err := uh.store.Get(r, "twilu-cookie")
 	if err != nil {
 		http.Error(w, "Bad session", http.StatusBadGateway)
 		return
@@ -210,7 +210,7 @@ func (u *UserHandler) UpdatePassword(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err2 := u.controller.UpdatePassword(userIDInt, currentPw, newPw)
+	err2 := uh.controller.UpdatePassword(userIDInt, currentPw, newPw)
 	if err2 != nil {
 		fmt.Fprint(w, "<div class='error'>Unable to update password.</div>")
 		return
