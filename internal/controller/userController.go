@@ -5,9 +5,9 @@ import (
 	"golang.org/x/crypto/bcrypt"
 	"log"
 	"strings"
-	"twilu/database"
-	"twilu/model"
-	"twilu/util"
+	"twilu/internal/database"
+	"twilu/internal/model"
+	"twilu/internal/util"
 )
 
 func CreateAccount(user model.User) error {

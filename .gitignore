@@ -1,2 +1,2 @@
-.env
+internal/database/.env
 .exe

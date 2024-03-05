@@ -2,6 +2,8 @@ package handler
 
 import (
 	"fmt"
+	"github.com/gorilla/sessions"
+	"github.com/joho/godotenv"
 	"html/template"
 	"io"
 	"log"
@@ -9,18 +11,15 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
-	"twilu/controller"
-	"twilu/model"
-	"twilu/util"
-
-	"github.com/gorilla/sessions"
-	"github.com/joho/godotenv"
+	"twilu/internal/controller"
+	"twilu/internal/model"
+	"twilu/internal/util"
 )
 
 var Store *sessions.CookieStore
 
 func Init() {
-	if err := godotenv.Load(); err != nil {
+	if err := godotenv.Load(".env"); err != nil {
 		log.Print("No .env file found")
 	}
 	sessionKey := os.Getenv("SESSION_KEY")
@@ -139,7 +138,7 @@ func GetFolders(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tmplPath := filepath.Join("templates", "folders.html")
+	tmplPath := filepath.Join("./internal/web/templates", "folders.html")
 	tmpl, err := template.ParseFiles(tmplPath)
 	if err != nil {
 		http.Error(w, "Unable to load template", http.StatusInternalServerError)
@@ -186,7 +185,7 @@ func GetUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tmplPath := filepath.Join("templates", "account.html")
+	tmplPath := filepath.Join("./internal/web/templates", "account.html")
 	tmpl, err := template.ParseFiles(tmplPath)
 	if err != nil {
 		http.Error(w, "Unable to load template", http.StatusInternalServerError)
@@ -254,7 +253,7 @@ func GetFeed(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tmplPath := filepath.Join("templates", "social.html")
+	tmplPath := filepath.Join("./internal/web/templates", "social.html")
 	tmpl, err := template.ParseFiles(tmplPath)
 	if err != nil {
 		http.Error(w, "Unable to load template", http.StatusInternalServerError)
@@ -295,7 +294,7 @@ func GetFolder(w http.ResponseWriter, r *http.Request) {
 		Folder model.Folder // Assuming Folder is the struct type
 	}
 	tmplData := TemplateData{Folder: folder}
-	tmplPath := filepath.Join("templates", "folder.html")
+	tmplPath := filepath.Join("./internal/web/templates", "folder.html")
 	tmpl, err := template.ParseFiles(tmplPath)
 	if err != nil {
 		http.Error(w, "Unable to load template", http.StatusInternalServerError)

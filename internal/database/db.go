@@ -1,13 +1,12 @@
 package database
 
 import (
-	"log"
-	"os"
-	"twilu/model"
-
 	"github.com/joho/godotenv"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	"log"
+	"os"
+	"twilu/internal/model"
 )
 
 var DB *gorm.DB

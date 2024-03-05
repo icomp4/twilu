@@ -2,10 +2,9 @@ package controller
 
 import (
 	"fmt"
-	"twilu/database"
-	"twilu/model"
-
 	"gorm.io/gorm"
+	"twilu/internal/database"
+	"twilu/internal/model"
 )
 
 func CreateFolder(folder model.Folder, userID int) error {
