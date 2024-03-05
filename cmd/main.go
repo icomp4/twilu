@@ -103,6 +103,7 @@ func main() {
 	mux.HandleFunc("DELETE /api/folder/{id}", folderHandler.DeleteFolder)
 	mux.HandleFunc("POST /api/folder/{id}/add", itemHandler.AddItem)
 	mux.HandleFunc("DELETE /api/folder/{id}/item/{itemID}", itemHandler.DeleteItem)
+	mux.HandleFunc("DELETE /api/user", userHandler.DeleteAccount)
 	mux.HandleFunc("GET /api/feed", folderHandler.GetFeed)
 	mux.HandleFunc("GET /api/user", userHandler.GetUser)
 	mux.HandleFunc("POST /api/password/update", userHandler.UpdatePassword)

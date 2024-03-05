@@ -221,3 +221,40 @@ func (uh *UserHandler) UpdatePassword(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusAccepted)
 
 }
+func (uh *UserHandler) DeleteAccount(w http.ResponseWriter, r *http.Request) {
+	sess, err := uh.store.Get(r, "twilu-cookie")
+	if err != nil {
+		http.Error(w, "Bad session", http.StatusBadGateway)
+		return
+	}
+
+	userID, ok := sess.Values["userID"]
+	if !ok {
+		http.Error(w, "User ID not found in session", http.StatusBadRequest)
+		return
+	}
+
+	userIDInt, ok := userID.(int)
+	if !ok {
+		http.Error(w, "User ID is of invalid type", http.StatusBadRequest)
+		return
+	}
+
+	err2 := uh.controller.DeleteAccount(userIDInt)
+	if err2 != nil {
+		http.Error(w, "failed to delete account", http.StatusBadRequest)
+		return
+	}
+	sess.Options = &sessions.Options{
+		Path:     "/",
+		MaxAge:   -1,
+		HttpOnly: true,
+		Secure:   true,
+	}
+	sess.Values["authenticated"] = false
+	err3 := sess.Save(r, w)
+	if err3 != nil {
+		http.Error(w, "Failed to save sess", http.StatusInternalServerError)
+		return
+	}
+}

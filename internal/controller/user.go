@@ -34,8 +34,14 @@ func (uc *UserController) CreateAccount(user model.User) error {
 }
 
 func (uc *UserController) DeleteAccount(id int) error {
-	var user model.User
-	if err := uc.DB.Unscoped().Delete(&user, id).Error; err != nil { // unscoped actually deletes the record, instead of soft deleting
+	if err := uc.DB.Unscoped().Where("owner_id = ?", id).Delete(&model.Item{}).Error; err != nil { // unscoped actually deletes the record, instead of soft deleting
+		return err
+	}
+	if err := uc.DB.Unscoped().Where("owner = ?", id).Delete(&model.Folder{}).Error; err != nil { // unscoped actually deletes the record, instead of soft deleting
+		return err
+	}
+
+	if err := uc.DB.Unscoped().Where("id = ?", id).Delete(&model.User{}).Error; err != nil {
 		return err
 	}
 	return nil

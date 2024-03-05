@@ -5,8 +5,56 @@
         <label>email: {{.Email}}</label>
         <input type="password" name="currentPassword" placeholder="current password">
         <input type="password" name="newPassword" placeholder="new password">
-        <button type="submit" hx-post="/api/password/update" hx-target="#response-message" hx-swap="innerHTML" >Confirm Password Change</button>
-        <button type="button">Delete Account</button>
+        <button type="submit" hx-post="/api/password/update" hx-target="#response-message" hx-swap="innerHTML">Confirm Password Change</button>
+        <button type="button" id="deleteAccBtn">Delete Account</button>
     </form>
     <div id="response-message"></div>
 </div>
+
+<div id="modal" class="modal">
+    <div class="modal-content">
+        <a href="#" class="close" id="closeAddModal">&times;</a>
+        <h4>Are you sure you want to delete your account?</h4>
+        <button type="button" class="submitBtn" id="deleteConfirmBtn">Delete</button>
+    </div>
+</div>
+
+<script>
+    var modal = document.getElementById('modal');
+    var btn = document.getElementById('deleteAccBtn');
+    var span = document.getElementsByClassName('close')[0];
+    var deleteBtn = document.getElementById('deleteConfirmBtn');
+
+    modal.style.display = "none";
+    btn.onclick = function () {
+        modal.style.display = "flex";
+    }
+
+    span.onclick = function (event) {
+        event.preventDefault();
+        modal.style.display = "none";
+    }
+
+    window.onclick = function (event) {
+        if (event.target == modal) {
+            modal.style.display = "none";
+        }
+    }
+
+    deleteBtn.onclick = function () {
+        console.log('Attempting to delete account');
+        fetch('/api/user', {
+            method: 'DELETE',
+        }).then(response => {
+            if (response.ok) {
+                alert("Account successfully deleted.");
+                window.location = '/login';
+            } else {
+                alert("An error occurred. Please try again.");
+            }
+        }).catch(error => {
+            console.error('Error:', error);
+            alert("An error occurred. Please try again.");
+        });
+    }
+</script>
