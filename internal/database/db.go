@@ -9,18 +9,21 @@ import (
 	"twilu/internal/model"
 )
 
-var DB *gorm.DB
-var err error
-
-func StartDB() {
+func New() (*gorm.DB, error) {
 	if err := godotenv.Load(); err != nil {
 		log.Print("No .env file found")
 	}
 	dbURL := os.Getenv("DB_URL")
 
-	DB, err = gorm.Open(postgres.Open(dbURL), &gorm.Config{})
+	db, err := gorm.Open(postgres.Open(dbURL), &gorm.Config{})
 	if err != nil {
-		log.Fatal("Error connecting to database")
+		return nil, err
 	}
-	DB.AutoMigrate(&model.User{}, &model.Folder{}, &model.Item{})
+
+	// AutoMigrate your models here
+	if err := db.AutoMigrate(&model.User{}, &model.Folder{}, &model.Item{}); err != nil {
+		return nil, err
+	}
+
+	return db, nil
 }

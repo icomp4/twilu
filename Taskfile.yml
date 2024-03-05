@@ -17,17 +17,3 @@ tasks:
     cmds:
       - ./{{.BIN_NAME}}
 
-  clean:
-    desc: Clean up generated files
-    cmds:
-      - if [ "{{OS}}" = "windows" ]; then del {{.BIN_NAME}}; else rm -f {{.BIN_NAME}}; fi
-
-  test:
-    desc: Run Go tests
-    cmds:
-      - go test ./...
-
-  lint:
-    desc: Lint the Go source code
-    cmds:
-      - golint ./...

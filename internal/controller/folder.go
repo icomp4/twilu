@@ -3,12 +3,21 @@ package controller
 import (
 	"fmt"
 	"gorm.io/gorm"
-	"twilu/internal/database"
 	"twilu/internal/model"
 )
 
-func CreateFolder(folder model.Folder, userID int) error {
-	return database.DB.Transaction(func(tx *gorm.DB) error {
+// FolderController handles operations on folders.
+type FolderController struct {
+	DB *gorm.DB
+}
+
+// NewFolderController creates a new instance of FolderController.
+func NewFolderController(db *gorm.DB) *FolderController {
+	return &FolderController{DB: db}
+}
+
+func (fc *FolderController) CreateFolder(folder model.Folder, userID int) error {
+	return fc.DB.Transaction(func(tx *gorm.DB) error {
 		var user model.User
 		if err := tx.First(&user, userID).Error; err != nil {
 			return fmt.Errorf("user not found: %w", err)
@@ -25,30 +34,8 @@ func CreateFolder(folder model.Folder, userID int) error {
 		return nil
 	})
 }
-func AddItemToFolder(folderID int, item model.Item, userID int) error {
-	return database.DB.Transaction(func(tx *gorm.DB) error {
-		var folder model.Folder
-		userIDUint := uint(userID)
-		if err := tx.First(&folder, folderID).Error; err != nil {
-			return fmt.Errorf("folder not found: %w", err)
-		}
-		var user model.User
-		if err := tx.First(&user, userID).Error; err != nil {
-			return fmt.Errorf("user not found: %w", err)
-		}
-		if folder.Owner != userIDUint {
-			return fmt.Errorf("user does not have permission to do that")
-		}
-		item.OwnerID = userIDUint
-		item.FolderID = folder.ID
-		if err := tx.Create(&item).Error; err != nil {
-			return fmt.Errorf("failed to create picture: %w", err)
-		}
-		return nil
-	})
-}
-func AddContributer(folderID int, userID int, newUserID int) error {
-	return database.DB.Transaction(func(tx *gorm.DB) error {
+func (fc *FolderController) AddContributer(folderID int, userID int, newUserID int) error {
+	return fc.DB.Transaction(func(tx *gorm.DB) error {
 		var folder model.Folder
 		var newUser model.User
 		folderIDUint := uint(folderID)
@@ -67,15 +54,15 @@ func AddContributer(folderID int, userID int, newUserID int) error {
 		return nil
 	})
 }
-func GetFolder(folderID int) (model.Folder, error) {
+func (fc *FolderController) GetFolder(folderID int) (model.Folder, error) {
 	var folder model.Folder
-	if err := database.DB.Model(&folder).Preload("Contributors").Preload("Items").Find(&folder, folderID).Error; err != nil {
+	if err := fc.DB.Model(&folder).Preload("Contributors").Preload("Items").Find(&folder, folderID).Error; err != nil {
 		return model.Folder{}, err
 	}
 	return folder, nil
 }
-func DeleteFolder(folderID int, userID int) error {
-	return database.DB.Transaction(func(tx *gorm.DB) error {
+func (fc *FolderController) DeleteFolder(folderID int, userID int) error {
+	return fc.DB.Transaction(func(tx *gorm.DB) error {
 		var user model.User
 		var folder model.Folder
 
@@ -107,32 +94,9 @@ func DeleteFolder(folderID int, userID int) error {
 		return nil
 	})
 }
-func DeleteItem(folderID int, userID int, itemID int) error {
-	return database.DB.Transaction(func(tx *gorm.DB) error {
-		var user model.User
-		var folder model.Folder
-		var item model.Item
-		if err := tx.First(&user, userID).Error; err != nil {
-			return fmt.Errorf("user not found: %w", err)
-		}
-		if err := tx.First(&folder, folderID).Error; err != nil {
-			return fmt.Errorf("folder not found: %w", err)
-		}
-		if err := tx.First(&item, itemID).Error; err != nil {
-			return fmt.Errorf("item not found: %w", err)
-		}
-		if userID != int(item.OwnerID) {
-			return fmt.Errorf("user is not the owner")
-		}
-		if err := tx.Unscoped().Delete(&item).Error; err != nil {
-			return fmt.Errorf("unable to delete item: %w", err)
-		}
-		return nil
-	})
-}
-func GetFeed() ([]model.Folder, error) {
+func (fc *FolderController) GetFeed() ([]model.Folder, error) {
 	var folders []model.Folder
-	if err := database.DB.Model(&model.Folder{}).Where("Private = ?", false).Find(&folders).Error; err != nil {
+	if err := fc.DB.Model(&model.Folder{}).Where("Private = ?", false).Find(&folders).Error; err != nil {
 		return []model.Folder{}, err
 	}
 	return folders, nil
