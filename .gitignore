@@ -1,2 +1,5 @@
 internal/database/.env
 .exe
+.yml
+.idea
+.exe

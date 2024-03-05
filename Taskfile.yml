@@ -1,0 +1,33 @@
+version: '3'
+
+vars:
+  BIN_NAME: "{{if eq OS \"windows\"}}bin/twilu.exe{{else}}bin/twilu{{end}}"  # Adjust BIN_NAME based on the OS
+  CMD_PATH: cmd/main.go
+
+tasks:
+  build:
+    desc: Build the Go application
+    cmds:
+      - go build -o {{.BIN_NAME}} {{.CMD_PATH}}
+    generates:
+      - "{{.BIN_NAME}}"
+
+  run:
+    desc: Run the Go application
+    cmds:
+      - ./{{.BIN_NAME}}
+
+  clean:
+    desc: Clean up generated files
+    cmds:
+      - if [ "{{OS}}" = "windows" ]; then del {{.BIN_NAME}}; else rm -f {{.BIN_NAME}}; fi
+
+  test:
+    desc: Run Go tests
+    cmds:
+      - go test ./...
+
+  lint:
+    desc: Lint the Go source code
+    cmds:
+      - golint ./...
