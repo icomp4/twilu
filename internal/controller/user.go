@@ -32,7 +32,6 @@ func (uc *UserController) CreateAccount(user model.User) error {
 	}
 	return nil
 }
-
 func (uc *UserController) DeleteAccount(id int) error {
 	if err := uc.DB.Unscoped().Where("owner_id = ?", id).Delete(&model.Item{}).Error; err != nil { // unscoped actually deletes the record, instead of soft deleting
 		return err
@@ -46,7 +45,6 @@ func (uc *UserController) DeleteAccount(id int) error {
 	}
 	return nil
 }
-
 func (uc *UserController) SignIn(user model.User) (model.User, error) {
 	var userLookUp model.User
 	err := uc.DB.Preload("Folders").Find(&userLookUp, "username = ?", user.Username).Error
@@ -59,7 +57,6 @@ func (uc *UserController) SignIn(user model.User) (model.User, error) {
 	}
 	return userLookUp, nil
 }
-
 func (uc *UserController) GetUserByID(userID int) (model.User, error) {
 	var user model.User
 	if err := uc.DB.First(&user, userID).Error; err != nil {
@@ -74,7 +71,6 @@ func (uc *UserController) GetUserFoldersByID(userID int) ([]model.Folder, error)
 	}
 	return folders, nil
 }
-
 func (uc *UserController) UpdatePassword(userID int, currentPw string, newPw string) error {
 	var user model.User
 	if err := uc.DB.First(&user, userID).Error; err != nil {

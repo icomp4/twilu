@@ -2,7 +2,6 @@ package cfg
 
 import (
 	"github.com/gorilla/sessions"
-	"github.com/joho/godotenv"
 	"log"
 	"net/http"
 	"os"
@@ -10,10 +9,6 @@ import (
 
 // InitializeSessionStore initializes the session store with environment-specific configurations.
 func InitializeSessionStore() *sessions.CookieStore {
-	if err := godotenv.Load(".env"); err != nil {
-		log.Print("No .env file found")
-	}
-
 	sessionKey := os.Getenv("SESSION_KEY")
 	if sessionKey == "" {
 		log.Fatal("SESSION_KEY is not set")
