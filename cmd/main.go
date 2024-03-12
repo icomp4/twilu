@@ -1,8 +1,10 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"text/template"
 	"twilu/cmd/api/handler"
 	"twilu/internal/cfg"
@@ -107,6 +109,7 @@ func main() {
 	mux.HandleFunc("GET /api/feed", folderHandler.GetFeed)
 	mux.HandleFunc("GET /api/user", userHandler.GetUser)
 	mux.HandleFunc("POST /api/password/update", userHandler.UpdatePassword)
-
-	log.Fatal(http.ListenAndServe(":8080", mux))
+	port := os.Getenv("PORT")
+	portStr := fmt.Sprintf("0.0.0.0:%s", port)
+	log.Fatal(http.ListenAndServe(portStr, mux))
 }
