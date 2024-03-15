@@ -66,7 +66,7 @@ func (uc *UserController) GetUserByID(userID int) (model.User, error) {
 }
 func (uc *UserController) GetUserFoldersByID(userID int) ([]model.Folder, error) {
 	var folders []model.Folder
-	if err := uc.DB.Model(&model.Folder{}).Where("owner = ?", userID).Find(&folders).Error; err != nil {
+	if err := uc.DB.Model(&model.Folder{}).Where("owner = ?", userID).Order("created_at DESC").Find(&folders).Error; err != nil {
 		return []model.Folder{}, err
 	}
 	return folders, nil

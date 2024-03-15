@@ -15,5 +15,7 @@ tasks:
   run:
     desc: Run the Go application
     cmds:
-      - ./{{.BIN_NAME}}
+      - docker build -t twilu .
+      - docker run -p 8080:8080 --env-file .env twilu
+
 

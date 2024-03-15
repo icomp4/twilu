@@ -96,7 +96,12 @@ func (fc *FolderController) DeleteFolder(folderID int, userID int) error {
 }
 func (fc *FolderController) GetFeed() ([]model.Folder, error) {
 	var folders []model.Folder
-	if err := fc.DB.Model(&model.Folder{}).Where("Private = ?", false).Find(&folders).Error; err != nil {
+	if err := fc.DB.Model(&model.Folder{}).
+		Where("Private = ?", false).
+		Order("created_at DESC").
+		Limit(20).
+		Find(&folders).Error; err != nil {
+		fmt.Println(folders)
 		return []model.Folder{}, err
 	}
 	return folders, nil
