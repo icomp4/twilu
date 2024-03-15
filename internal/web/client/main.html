@@ -261,7 +261,24 @@
             text-decoration: none;
             cursor: pointer;
         }
-
+        .searchContainer{
+            display: flex;
+            border-radius: 50px;
+            justify-content: center;
+            align-items: center;
+            margin: 20px 0;
+        }
+        .search{
+            width: 600px;
+            height: 40px;
+            border-radius: 25px;
+            border: none;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        .search:focus{
+            outline: #59538d 2px solid;
+        }
 
     </style>
 </head>
@@ -274,7 +291,10 @@
             <li><a class="accBtn"href="/account">Account</a></li>
         </ul>
     </nav>
-    <div class="cards-container" hx-get="/api/user/folders" hx-trigger="load">
+    <div class="searchContainer">
+        <input class="search" type="text" id="search" name="search" placeholder="search for folders.." autocomplete="off">
+    </div>
+    <div class="cards-container" id="cards-container" hx-get="/api/user/folders" hx-trigger="load">
         <p>Loading folders...</p>
     </div>    
     <div id="modal" class="modal">
@@ -325,5 +345,37 @@
     event.preventDefault();
     modal.style.display = "none";
 }
+</script>
+<script>
+    document.getElementById('search').addEventListener('input', function(e) {
+        const query = e.target.value.toLowerCase();
+        const filteredFolders = folders.filter(folder => folder.Name.toLowerCase().includes(query));
+        updateFoldersDisplay(filteredFolders);
+    });
+
+    function updateFoldersDisplay(folders) {
+        const folderContainer = document.getElementById('cards-container');
+        folderContainer.innerHTML = ''; // Clear the container
+
+        folders.forEach(folder => {
+            const element = document.createElement('div');
+            element.className = 'folder'; // If you have specific styles for folders
+            element.innerHTML = `<a href="/folder/${folder.ID}" class="card-link">
+                                    <div class="card" style="background-image: url('${folder.CoverURL}');">
+                                        <div class="card-overlay">
+                                            <div class="text">
+                                                <span>${folder.Name}</span>
+                                                <p class="subtitle">@${folder.OwnerUsername}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </a>`;
+            folderContainer.appendChild(element);
+        });
+
+        if (folders.length === 0) {
+            folderContainer.innerHTML = '<p>No folders found</p>';
+        }
+    }
 </script>
 </html>

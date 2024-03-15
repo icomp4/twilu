@@ -1,4 +1,7 @@
 {{if .HasFolders}}
+<script>
+    var folders = {{.FoldersJSON}};
+</script>
 {{range .Folders}}
 <a href="/folder/{{.ID}}" class="card-link">
     <div class="card" style="background-image: url('{{.CoverURL}}');">

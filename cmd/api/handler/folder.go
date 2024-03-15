@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"encoding/json"
 	"github.com/gorilla/sessions"
 	"html/template"
 	"log"
@@ -48,13 +49,22 @@ func (h *FolderHandler) GetFeed(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	data := struct {
-		Folders    []model.Folder
-		HasFolders bool
-	}{
-		Folders:    folders,
-		HasFolders: len(folders) > 0,
+	foldersJSON, err := json.Marshal(folders)
+	if err != nil {
+		http.Error(w, "Unable to marshal folders", http.StatusInternalServerError)
+		return
 	}
+
+	data := struct {
+		Folders     []model.Folder
+		FoldersJSON template.JS
+		HasFolders  bool
+	}{
+		Folders:     folders,
+		FoldersJSON: template.JS(foldersJSON),
+		HasFolders:  len(folders) > 0,
+	}
+
 	w.Header().Set("Content-Type", "text/html")
 	err = tmpl.Execute(w, data)
 	if err != nil {

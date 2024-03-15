@@ -1,5 +1,4 @@
 .env
 .exe
 .idea
-Dockerfile
-.dockerignore
+load-env.ps1
