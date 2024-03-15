@@ -56,7 +56,12 @@ func (fc *FolderController) AddContributer(folderID int, userID int, newUserID i
 }
 func (fc *FolderController) GetFolder(folderID int) (model.Folder, error) {
 	var folder model.Folder
-	if err := fc.DB.Model(&folder).Preload("Contributors").Preload("Items").Find(&folder, folderID).Error; err != nil {
+	if err := fc.DB.Model(&folder).
+		Preload("Contributors").
+		Preload("Items", func(db *gorm.DB) *gorm.DB {
+			return db.Order("created_at DESC")
+		}).
+		Find(&folder, folderID).Error; err != nil {
 		return model.Folder{}, err
 	}
 	return folder, nil
