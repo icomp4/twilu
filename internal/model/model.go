@@ -7,7 +7,7 @@ import (
 type User struct {
 	gorm.Model
 	Email          string    `gorm:"uniqueIndex;not null"`
-	Username       string    `gorm:"not null"`
+	Username       string    `gorm:"uniqueIndex;not null"`
 	Password       string    `gorm:"not null"`
 	Folders        []*Folder `gorm:"many2many:user_folders;"`
 	ProfilePicture string
