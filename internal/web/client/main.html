@@ -8,6 +8,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
     <title>twilu</title>
+
     <style>
         :root {
             font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
@@ -355,11 +356,11 @@
 
     function updateFoldersDisplay(folders) {
         const folderContainer = document.getElementById('cards-container');
-        folderContainer.innerHTML = ''; // Clear the container
+        folderContainer.innerHTML = '';
 
         folders.forEach(folder => {
             const element = document.createElement('div');
-            element.className = 'folder'; // If you have specific styles for folders
+            element.className = 'folder';
             element.innerHTML = `<a href="/folder/${folder.ID}" class="card-link">
                                     <div class="card" style="background-image: url('${folder.CoverURL}');">
                                         <div class="card-overlay">

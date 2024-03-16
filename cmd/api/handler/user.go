@@ -217,16 +217,19 @@ func (uh *UserHandler) UpdatePassword(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "User ID is of invalid type", http.StatusBadRequest)
 		return
 	}
+	if currentPw == "" || newPw == "" {
+		fmt.Fprint(w, "<div class='error'>Fields must not be blank</div>")
+		return
+	}
 
 	err2 := uh.controller.UpdatePassword(userIDInt, currentPw, newPw)
 	if err2 != nil {
 		fmt.Fprint(w, "<div class='error'>Unable to update password.</div>")
 		return
 	}
-	fmt.Fprint(w, "<div class='success'>Password successfully updated.</div>")
-
 	w.Header().Set("HX-Redirect", "/account")
 	w.WriteHeader(http.StatusAccepted)
+	fmt.Fprint(w, "<div class='success'>Password successfully updated.</div>")
 
 }
 func (uh *UserHandler) DeleteAccount(w http.ResponseWriter, r *http.Request) {

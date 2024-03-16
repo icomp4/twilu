@@ -33,18 +33,28 @@ func (uc *UserController) CreateAccount(user model.User) error {
 	return nil
 }
 func (uc *UserController) DeleteAccount(id int) error {
-	if err := uc.DB.Unscoped().Where("owner_id = ?", id).Delete(&model.Item{}).Error; err != nil { // unscoped actually deletes the record, instead of soft deleting
+	if err := uc.DB.Unscoped().Exec("DELETE FROM user_folders WHERE folder_id IN (SELECT id FROM folders WHERE owner = ?)", id).Error; err != nil {
 		return err
 	}
-	if err := uc.DB.Unscoped().Where("owner = ?", id).Delete(&model.Folder{}).Error; err != nil { // unscoped actually deletes the record, instead of soft deleting
+
+	if err := uc.DB.Unscoped().Exec("DELETE FROM folder_contributors WHERE folder_id IN (SELECT id FROM folders WHERE owner = ?)", id).Error; err != nil {
+		return err
+	}
+	if err := uc.DB.Unscoped().Where("owner_id = ?", id).Delete(&model.Item{}).Error; err != nil {
+		return err
+	}
+
+	if err := uc.DB.Unscoped().Where("owner = ?", id).Delete(&model.Folder{}).Error; err != nil {
 		return err
 	}
 
 	if err := uc.DB.Unscoped().Where("id = ?", id).Delete(&model.User{}).Error; err != nil {
 		return err
 	}
+
 	return nil
 }
+
 func (uc *UserController) SignIn(user model.User) (model.User, error) {
 	var userLookUp model.User
 	err := uc.DB.Preload("Folders").Find(&userLookUp, "username = ?", user.Username).Error
@@ -76,12 +86,15 @@ func (uc *UserController) UpdatePassword(userID int, currentPw string, newPw str
 	if err := uc.DB.First(&user, userID).Error; err != nil {
 		return err
 	}
-	if util.PasswordIsValid(currentPw) == false {
+	if util.PasswordIsValid(newPw) == false {
 		return fmt.Errorf("invalid password")
+	}
+	if newPw == currentPw {
+		return fmt.Errorf("new password can't be the same as the old one")
 	}
 	err2 := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(currentPw))
 	if err2 != nil {
-		return err2
+		return fmt.Errorf("incorrect password")
 	}
 	password, err := bcrypt.GenerateFromPassword([]byte(newPw), bcrypt.DefaultCost)
 	if err != nil {
